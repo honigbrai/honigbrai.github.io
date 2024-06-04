@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<style>
+    body{
+        font-family: Monaco, Consolas;
+		background-color: #333;
+		color: #CCC;
+    }
+    .prevent-select {
+        -webkit-user-select: none; /* Safari */
+        -ms-user-select: none; /* IE 10 and IE 11 */
+        user-select: none; /* Standard syntax */
+		text-align: center;
+    }
+
+    .tooltip {
+        position: relative;
+        display: inline-block;
+    }
+
+    .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 140px;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px;
+        position: absolute;
+        z-index: 1;
+        bottom: 150%;
+        left: 50%;
+        margin-left: -75px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .tooltip:hover .tooltiptext {
+        visibility: visible;
+        opacity: 1;
+    }
+</style>
+<html>
+    <head>
+		<title>Password Generator</title>
+		<meta name="viewport" content="width=device-width">
+        <h1 class="prevent-select">
+            Password Generator
+        </h1>
+      </head>
+    <body>
+
+        <div class="prevent-select">
+            <br>
+			
+			
+        </div>
+		<div style="text-align:center;">
+		<a>PW: </a>
+        <input style="width:30%" type="text" id="pw2" aria-describedby="crackTime" placeholder="Generated password" readonly>
+        <div class="tooltip">
+            <button onclick="copy()" class="prevent-select" onmouseout="tooltipchange()">
+                <span class="tooltiptext" id="tooltip">Copy to clipboard</span>
+            Copy</button>
+        </div>
+		</div>
+        
+        
+        
+        <div class="prevent-select">
+            <a >time to crack: <span id="tc"></span></a><br>
+            <br>
+            <a >lenght: <span id="lenght"></span></a><br>
+            <input style="width:50%" type="range" min="1" max="50" value="10" class="slider" id="myRange">
+
+            <br>
+            <br>
+            <input type="checkbox" id="lc" onclick="update()" checked><label for="lc">Lowercase</label>
+            <input type="checkbox" id="uc" onclick="update()"><label for="uc">Uppercase</label>
+            <input type="checkbox" id="nc" onclick="update()"><label for="nc">Number</label>
+            <input type="checkbox" id="sc" onclick="update()"><label for="sc">Symbol</label>
+        </div>
+
+        <script>
+            var slider = document.getElementById("myRange");
+            var output = document.getElementById("lenght");
+            var tc = document.getElementById("tc");
+            var pw2 = document.getElementById("pw2");
+
+            var lc = document.getElementById("lc");
+            var uc = document.getElementById("uc");
+            var nc = document.getElementById("nc");
+            var sc = document.getElementById("sc");
+            var tooltip = document.getElementById("tooltip");
+
+            slider.oninput = function() {update();};
+            output.textContent = slider.value;
+            update();
+            function update(){
+                var characters = 0;
+
+                const characterarray = [];
+
+                if(lc.checked){
+                    characterarray.push( 'abcdefghijklmnopqrstuvwxyz');
+                    characters = 1;
+                }
+                if(uc.checked){
+                    characterarray.push( 'ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+                    characters = 1;
+                }
+                if(nc.checked){
+                    characterarray.push( '0123456789');
+                    characters = 1;
+                }
+                if(sc.checked){
+                    characterarray.push( '°!"§$%&/()=?*\'_:;><{[]}\\~+#-.,');
+                    characters = 1;
+                }
+
+                output.textContent = slider.value;
+                if(characters == 0){
+                    tc.textContent = 'NaN';
+                    pw2.value = '';
+                }
+                else{
+                    var lenght = 0;
+                    for(var i = 0; i < characterarray.length; i++){
+                        lenght = lenght+ characterarray[i].length;
+                    }
+                    var cracktime = Math.pow(lenght, slider.value) / 20000000000;
+                    var cracktext;
+                    if(cracktime <= 1/1000000){
+                        cracktext = cracktime*1000*1000000 + " ns";
+                    }else
+                    if(cracktime <= 1){
+                        cracktext = cracktime*1000 + " ms";
+                    }else
+                    if(cracktime <= 60){
+                        cracktext = cracktime + " s";
+                    }else
+                    if(cracktime <= 60*60){
+                        cracktext = cracktime/60 + " min";
+                    }else
+                    if(cracktime <= 60*60*24){
+                        cracktext = cracktime/60/60 + " hours";
+                    }else
+                    if(cracktime <= 60*60*24*30){
+                        cracktext = cracktime/60/60/24 + " days";
+                    }else
+                    if(cracktime <= 60*60*24*365){
+                        cracktext = cracktime/60/60/24/30 + " months";
+                    }else
+                    {
+                    //if(cracktime <= 60*60*24*365){
+                        cracktext = cracktime/60/60/24/365 + " years";
+                    }
+
+                    tc.textContent =  cracktext;
+                    pw2.value = random(slider.value, characterarray);
+                }
+            }
+
+            function copy(){
+                pw2.select();
+                pw2.setSelectionRange(0, 99999);
+                navigator.clipboard.writeText(pw2.value);
+                tooltip.innerHTML = "Copied Password";
+            }
+
+            function tooltipchange(){
+                tooltip.innerHTML = "Copy to clipboard";
+            }
+
+            function random(length, characterarray) {
+                let result = '';
+                let counter = 0;
+
+                while (counter < length) {
+                    
+                    const characters = characterarray[Math.floor(Math.random() * characterarray.length)];
+
+                    const charactersLength = characters.length;
+
+                    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+                    counter += 1;
+                }
+                return result;
+            }
+        </script>
+    </body>
+</html>
