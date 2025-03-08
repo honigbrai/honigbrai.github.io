@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+    <body bgcolor="33 33 33" style="font-family: Monaco, Consolas; color: #ccc;">
+        <h1 align="center">One Rep Max Calculator</h1>
+        <table align="center">
+            <tbody>
+                <tr>
+                    <td>
+                        Method:
+                        <br>
+                        <select name="method" id="method" onclick="update()">
+                            <option value="brzycki">Brzycki</option>
+                            <option value="epley">Epley</option>
+                            <option value="lander">Lander</option>
+                            <option value="lombardi">Lombardi</option>
+                            <option value="mayhew">Mayhew et al</option>
+                            <option value="oconner">O’Conner et al</option>
+                            <option value="wathan">Wathan</option>
+                            <option value="average">average</option>
+                        </select>
+                    </td>
+                    <td>
+                        Formular:
+                        <br>
+                        <input type="text" id="f" onclick="update()" placeholder="formular" readonly>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        Weight:
+                        <br>
+                        <input type="number" id="m" oninput="update()" placeholder="weight">
+                    </td>
+                    <td>
+                        Reps:
+                        <br>
+                        <input type="number" id="r" oninput="update()" placeholder="reps">
+
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        calculated one rep max: <input type="number" id="c" onclick="update()" placeholder="calculated 1rm" readonly>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        
+    </body>
+    <script>
+        var max = document.getElementById("m");
+        var reps = document.getElementById("r");
+        var calc = document.getElementById("c");
+        var method = document.getElementById("method");
+        var formular = document.getElementById("f");
+        update();
+        function update() {
+            var brzycki = max.value * ( 36 / (37 - reps.value));
+            var epley = max.value * ( 1 + reps.value / 30);
+            var lander = 100 * max.value / ( 101.3 - 2.67123 * reps.value);
+            var lombardi = max.value * Math.pow(reps.value, 0.1);
+            var mayhew = 100 * max.value / (52.2 + 41.9 *  Math.pow(Math.E, -0.055 * reps.value));
+            var oconner = max.value * (1+ 0.025 * reps.value);
+            var wathan = 100 * max.value / (48.8 + 53.8 *  Math.pow(Math.E, -0.075 * reps.value));
+
+            switch(method.value){
+                case "brzycki":
+                    calc.value = brzycki;
+                    formular.value = "weight * (36 / (37 - reps))";
+                break;
+                case "epley":
+                    calc.value = epley;
+                    formular.value = "weight * (1 + reps / 30)";
+                break;
+                case "lander":
+                    calc.value = lander;
+                    formular.value = "100 * weight / ( 101.3 - 2.67123 * reps)";
+                break;
+                case "lombardi":
+                    calc.value = lombardi;
+                    formular.value = "weight * reps ^ 0.1";
+                break;
+                case "mayhew":
+                    calc.value = mayhew;
+                    formular.value = "100 * weight / (52.2 + 41.9 *  e^(-0.055 * reps)))";
+                break;
+                case "oconner":
+                    calc.value = oconner;
+                    formular.value = "weight * (1+ 0.025 * reps)";
+                break;
+                case "wathan":
+                    calc.value = wathan;
+                    formular.value = "100 * weight / (48.8 + 53.8 *  e^(-0.075 * reps)))";
+                break;
+                case "average":
+                    calc.value = (brzycki+ epley+ lander+ lombardi+ mayhew+ oconner+ wathan)/7;
+                    formular.value = "all comined";
+                break;
+            }
+            if(0 == max.value || 0 == reps.value){
+                calc.value = NaN;
+            }
+        }
+    </script>
+</html>
