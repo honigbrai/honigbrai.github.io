@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width">
+    </head>
+    <body bgcolor="33 33 33" style="font-family: Monaco, Consolas; color: #ccc;">
+        <h1 align="center">GPS Distance Tool</h1>
+        <table align="center">
+            <tbody>
+                <tr>
+                    <td>
+                        <button onclick="getPointA()">
+                            Set Point A
+                        </button> 
+                    </td>
+                    <td>
+                        <a id="acord"></a></td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <button onclick="getPointB()">
+                            Set Point B
+                        </button>
+                    </td>
+                    <td>
+                        <a id="bcord"></a>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <button onclick="d()">
+                            Get Distance
+                        </button>
+                    </td>
+                    <td>
+                        <a id="dis"></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </body>
+    <script>
+        const a = document.getElementById("acord");
+        const b = document.getElementById("bcord");
+        const dis = document.getElementById("dis");
+
+        var coordsa = null;
+        var coordsb = null;
+
+        function getPointA() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(successA, error);
+            } else { 
+                x.innerHTML = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        function getPointB() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(successB, error);
+            } else { 
+                x.innerHTML = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        function successA(position) {
+            coordsa= position.coords;
+            a.innerHTML = "Latitude: " + position.coords.latitude + 
+            " Longitude: " + position.coords.longitude;
+        }
+
+        function successB(position) {
+            coordsb= position.coords;
+            b.innerHTML = "Latitude: " + position.coords.latitude + 
+            " Longitude: " + position.coords.longitude;
+        }
+
+        function d(){
+            const R = 6371e3;
+            const angle1 = coordsa.latitude * Math.PI/180; 
+            const angle2 = coordsb.latitude * Math.PI/180;
+            const anglediflat = (coordsb.latitude-coordsa.latitude) * Math.PI/180;
+            const anglediflon = (coordsb.longitude-coordsa.longitude) * Math.PI/180;
+
+            const a = Math.sin(anglediflat/2) * Math.sin(anglediflat/2) +
+                        Math.cos(angle1) * Math.cos(angle2) *
+                        Math.sin(anglediflon/2) * Math.sin(anglediflon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+            const d = R * c;
+            console.log(d);
+            
+            dis.innerHTML = d+"m";
+        }
+
+        function error() {
+            alert("Sorry, no position available.");
+        }
+    </script>
+</html>
