@@ -43,12 +43,13 @@
     </body>
     <script>
 
+
         const options = {
             enableHighAccuracy: true,
             timeout: 5000,
-            maximumAge: 0
+            maximumAge: 0,
+            desiredAccuracy: 2
         };
-
         const a = document.getElementById("acord");
         const b = document.getElementById("bcord");
         const dis = document.getElementById("dis");
@@ -58,7 +59,8 @@
 
         function getPointA() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(successA, error, options);
+                
+                gps(successA, waitingA, error, options);
             } else { 
                 x.innerHTML = "Geolocation is not supported by this browser.";
             }
@@ -66,10 +68,21 @@
 
         function getPointB() {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(successB, error, options);
+                gps(successB, waitingB, error, options);
             } else { 
                 x.innerHTML = "Geolocation is not supported by this browser.";
             }
+        }
+
+        
+        function waitingA(position) {
+            coordsa= position.coords;
+            a.innerHTML = "waiting "+ position.coords.accuracy;
+        }
+
+        function waitingB(position) {
+            coordsb= position.coords;
+            b.innerHTML = "waiting "+ position.coords.accuracy;
         }
 
         function successA(position) {
@@ -97,13 +110,50 @@
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 
             const d = R * c;
-            console.log(d);
             
             dis.innerHTML = d+"m";
         }
 
+        
+
+            
+
         function error() {
             alert("Sorry, no position available.");
         }
+
+        function gps(success, waiting, error, options){
+
+            var wID;
+            var tID;
+            var lastgps, lastaccuracy = -1;
+
+            function accuracy(position){
+                if(position.coords.accuracy < lastaccuracy || lastaccuracy == -1){
+                    lastaccuracy = position.coords.accuracy;
+                    lastgps= position;
+                }
+                
+                if(position.coords.accuracy <= options.desiredAccuracy){
+                    navigator.geolocation.clearWatch(wID);
+                    clearTimeout(tID);
+                    success(position);
+
+                }else{
+                    waiting(position);
+                }
+
+            }
+
+            function timeout(){
+                navigator.geolocation.clearWatch(wID);
+                success(lastgps);
+            }
+
+            wID = navigator.geolocation.watchPosition(accuracy, error, options);
+            tID = setTimeout(timeout, options.timeout)
+        }
+
+
     </script>
 </html>
