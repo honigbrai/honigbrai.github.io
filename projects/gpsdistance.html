@@ -76,25 +76,23 @@
 
         
         function waitingA(position) {
-            coordsa= position.coords;
-            a.innerHTML = "waiting "+ position.coords.accuracy;
+            a.innerHTML = "waiting "+ position.accuracy;
         }
 
         function waitingB(position) {
-            coordsb= position.coords;
-            b.innerHTML = "waiting "+ position.coords.accuracy;
+            b.innerHTML = "waiting "+ position.accuracy;
         }
 
         function successA(position) {
-            coordsa= position.coords;
-            a.innerHTML = "Latitude: " + position.coords.latitude + 
-            " Longitude: " + position.coords.longitude;
+            coordsa= position;
+            a.innerHTML = "Latitude: " + position.latitude + 
+            " Longitude: " + position.longitude;
         }
 
         function successB(position) {
-            coordsb= position.coords;
-            b.innerHTML = "Latitude: " + position.coords.latitude + 
-            " Longitude: " + position.coords.longitude;
+            coordsb= position;
+            b.innerHTML = "Latitude: " + position.latitude + 
+            " Longitude: " + position.longitude;
         }
 
         function d(){
@@ -127,31 +125,59 @@
             var wID;
             var tID;
             var lastgps, lastaccuracy = -1;
+            var latitudesum = 0, longitudesum = 0;
+            var counter = 0;
 
             function accuracy(position){
+                counter++;
+
+                console.log(counter);
+                
+
+                latitudesum = latitudesum + position.coords.latitude;
+                longitudesum = longitudesum + position.coords.longitude;
+
                 if(position.coords.accuracy < lastaccuracy || lastaccuracy == -1){
                     lastaccuracy = position.coords.accuracy;
                     lastgps= position;
+
                 }
-                
+                var out = {
+                    latitude: position.coords.latitude,
+                    longitude: position.coords.longitude,
+                    accuracy: position.coords.accuracy
+                };
                 if(position.coords.accuracy <= options.desiredAccuracy){
                     navigator.geolocation.clearWatch(wID);
                     clearTimeout(tID);
-                    success(position);
+                    
+                    success(out);
 
                 }else{
-                    waiting(position);
+                    waiting(out);
                 }
 
             }
 
             function timeout(){
                 navigator.geolocation.clearWatch(wID);
-                success(lastgps);
+                
+                var out = {
+                    latitude: latitudesum / counter,
+                    longitude: longitudesum / counter,
+                    accuracy: lastgps.coords.accuracy
+                };
+                success(out);
             }
 
-            wID = navigator.geolocation.watchPosition(accuracy, error, options);
-            tID = setTimeout(timeout, options.timeout)
+            function error2(){
+                if(counter == 0){
+                    error();
+                }
+            }
+
+            wID = navigator.geolocation.watchPosition(accuracy, error2, options);
+            tID = setTimeout(timeout, 5000)
         }
 
 
