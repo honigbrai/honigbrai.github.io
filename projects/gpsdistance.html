@@ -177,7 +177,7 @@
             }
 
             wID = navigator.geolocation.watchPosition(accuracy, error2, options);
-            tID = setTimeout(timeout, 5000)
+            tID = setTimeout(timeout, options.timeout)
         }
 
 
